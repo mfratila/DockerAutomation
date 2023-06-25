@@ -1,6 +1,5 @@
 package org.example.tests;
 
-import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;
@@ -18,7 +17,8 @@ public class HomePageTest extends BaseTest {
 
     @Test
     public void whenNavigatingToHomepage_theCorrectTitleAppears() {
-        getDriver().get(homePageUrl);
+
+        getPage(homePageUrl);
 
         String homepageTitle = getDriver().getTitle();
 
@@ -29,9 +29,10 @@ public class HomePageTest extends BaseTest {
 
     @Test
     public void whenNavigatingToHomepage_theCorrectH1Appears() {
-        getDriver().get(homePageUrl);
 
-        String homepageTitle = getDriver().findElement(By.id("pageTitle")).getText();
+        getPage(homePageUrl);
+
+        String homepageTitle = getElementById("pageTitle").getText();
 
         assertThat(homepageTitle).as("H1 is not correct")
                 .isEqualTo("Welcome to My Web Application");
@@ -40,9 +41,10 @@ public class HomePageTest extends BaseTest {
 
     @Test
     public void whenNavigatingToHomepage_theCorrectParagraphAppears() {
-        getDriver().get(homePageUrl);
 
-        String homepageTitle = getDriver().findElement(By.id("mainParagraph")).getText();
+        getPage(homePageUrl);
+
+        String homepageTitle = getElementById("mainParagraph").getText();
 
         assertThat(homepageTitle).as("Paragraph is not correct")
                 .isEqualTo("This is a sample homepage.");

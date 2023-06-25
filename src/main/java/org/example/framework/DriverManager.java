@@ -13,6 +13,7 @@ public class DriverManager
     private final static String seleniumGridUrl = "http://localhost:4444/wd/hub";
     private final RemoteWebDriver driverManager;
 
+
     public DriverManager() throws MalformedURLException {
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.setAcceptInsecureCerts(true);
