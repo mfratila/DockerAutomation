@@ -1,22 +1,42 @@
 package org.example.docker;
 
-import org.testcontainers.containers.DockerComposeContainer;
 
-import java.io.File;
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.PullImageResultCallback;
+import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientImpl;
+import com.github.dockerjava.transport.DockerHttpClient;
+import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+
+import java.io.IOException;
+import java.time.Duration;
 
 public class DockerComposeLauncher {
-    public static void main(String[] args) {
-        String composeFilePath = "C:\\Dev Stuff\\Java\\Spring\\DockerProj\\app\\docker-compose.yml";
+    public static void main(String[] args) throws InterruptedException, IOException {
+        String composeFilePath = "/path/to/docker-compose.yml"; // Specify the path to your Docker Compose file
 
-        DockerComposeContainer<?> composeContainer = new DockerComposeContainer<>(new File(composeFilePath))
-                .withLocalCompose(true);
+        DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
 
-        // Start the Docker Compose containers
-        composeContainer.start();
+        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
+                .dockerHost(config.getDockerHost())
+                .sslConfig(config.getSSLConfig())
+                .maxConnections(100)
+                .connectionTimeout(Duration.ofSeconds(30))
+                .responseTimeout(Duration.ofSeconds(45))
+                .build();
 
-        // Run your tests or perform operations on the containers
+        DockerClient dockerClient = DockerClientImpl.getInstance(config, httpClient);
 
-        // Stop and remove the Docker Compose containers
-       // composeContainer.stop();
+        dockerClient.pullImageCmd("docker/compose")
+                .withTag("1.29.2") // Specify the desired version of Docker Compose
+                .exec(new PullImageResultCallback())
+                .awaitCompletion();
+
+        dockerClient
+                .createContainerCmd("docker/compose:1.29.2")
+                .withCmd("-f", composeFilePath, "up", "-d")
+                .exec();
+
+        dockerClient.close();
     }
 }
